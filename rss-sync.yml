@@ -1,0 +1,66 @@
+name: RSS SYNC
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '30 4,10,16,22 * * *'  # 每天在 4:30, 10:30, 16:30, 22:30 (UTC) 运行
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  sync:
+    name: Sync RSS Files
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Download RSS files
+        run: |
+          # 删除旧文件
+          rm -f *.rss
+          
+          # Download bloomberg-politics RSS file
+          echo "Downloading bloomberg-politics RSS file..."
+          wget -q https://feeds.bloomberg.com/politics/news.rss -O bloomberg-politics.rss || { echo "Failed to download bloomberg-politics.rss"; exit 1; }
+
+          
+          # Download bloomberg-technology RSS file
+          echo "Downloading bloomberg-technology file..."
+          wget -q https://feeds.bloomberg.com/technology/news.rss -O bloomberg-technology.rss || { echo "Failed to download bloomberg-technology.rss"; exit 1; }
+          
+          # Download bloomberg-economics RSS file
+          echo "Downloading bloomberg-economics file..."
+          wget -q https://feeds.bloomberg.com/economics/news.rss -O bloomberg-economics.rss || { echo "Failed to download bloomberg-economics.rss"; exit 1; } 
+          
+          # Download bloomberg-markets RSS file
+          echo "Downloading bloomberg-markets file..."
+          wget -q https://feeds.bloomberg.com/markets/news.rss -O bloomberg-markets.rss || { echo "Failed to download bloomberg-markets.rss"; exit 1; } 
+
+          # 验证文件是否下载成功
+          for file in bloomberg-politics.rss bloomberg-technology.rss bloomberg-economics.rss bloomberg-markets.rss; do
+            if [ ! -s "$file" ]; then
+              echo "Error: $file is empty or not downloaded"
+              exit 1
+            fi
+          done
+          
+          echo "All RSS files downloaded successfully!"
+
+      - name: Commit and push changes
+        run: |
+          
+          # 配置 Git
+          git config --local user.name "GitHub Actions Bot"
+          git config --local user.email "actions@github.com"
+          
+          # 提交变更
+          git add bloomberg-politics.rss bloomberg-technology.rss bloomberg-economics.rss bloomberg-markets.rss
+          git commit -m "chore: auto sync RSS files [skip ci]"
+          
+          # 推送变更
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
