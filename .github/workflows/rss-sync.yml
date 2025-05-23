@@ -20,7 +20,7 @@ jobs:
       - name: Download RSS files
         run: |
           # 删除旧文件
-          rm -f *.rss
+          rm -f *.rss *.xml
           
           # Download bloomberg-politics RSS file
           echo "Downloading bloomberg-politics RSS file..."
