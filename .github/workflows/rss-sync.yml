@@ -38,21 +38,9 @@ jobs:
           # Download bloomberg-markets RSS file
           echo "Downloading bloomberg-markets file..."
           wget -q https://feeds.bloomberg.com/markets/news.rss -O bloomberg-markets.rss || { echo "Failed to download bloomberg-markets.rss"; exit 1; } 
-
-          # Download zaobao-china RSS file
-          echo "Downloading zaobao-china RSS file..."
-          wget -q https://rsshub.app/zaobao/znews/china -O zaobao-china.xml || { echo "Failed to download zaobao-china.xml"; exit 1; }
-
-          # Download zaobaort-china RSS file
-          echo "Downloading zaobaort-china RSS file..."
-          wget -q https://rsshub.app/zaobao/realtime/china -O zaobaort-china.xml || { echo "Failed to download zaobaort-china.xml"; exit 1; }
-
-          # Download zaobaort-world RSS file
-          echo "Downloading zaobaort-world RSS file..."
-          wget -q https://rsshub.app/zaobao/realtime/world -O zaobaort-world.xml || { echo "Failed to download zaobaort-world.xml"; exit 1; }
           
           # 验证文件是否下载成功
-          for file in bloomberg-politics.rss bloomberg-technology.rss bloomberg-economics.rss bloomberg-markets.rss zaobao-china.xml zaobaort-china.xml zaobaort-world.xml; do
+          for file in bloomberg-politics.rss bloomberg-technology.rss bloomberg-economics.rss bloomberg-markets.rss; do
             if [ ! -s "$file" ]; then
               echo "Error: $file is empty or not downloaded"
               exit 1
@@ -69,7 +57,7 @@ jobs:
           git config --local user.email "actions@github.com"
           
           # 提交变更
-          git add bloomberg-politics.rss bloomberg-technology.rss bloomberg-economics.rss bloomberg-markets.rss zaobao-china.xml zaobaort-china.xml zaobaort-world.xml
+          git add bloomberg-politics.rss bloomberg-technology.rss bloomberg-economics.rss bloomberg-markets.rss
           git commit -m "chore: auto sync RSS files [skip ci]"
           
           # 推送变更
